@@ -24,7 +24,7 @@ public interface EmployeeActivationMapper
 		 * @param employeeActivation
 		 * @return
 		 */
-		@Mapping( target = "employeeInformations", ignore = true )
+		@Mapping( target = "employeeInformationDTOs", ignore = true )
 		EmployeeActivationDTO toDTO( EmployeeActivation employeeActivation );
 		
 		/**

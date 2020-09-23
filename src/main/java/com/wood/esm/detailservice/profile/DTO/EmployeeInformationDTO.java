@@ -34,14 +34,16 @@ public class EmployeeInformationDTO extends DateInformationDTO {
 
 	private String employeeLastName;
 
-	private String employeeSSN;
+	private String employeeGovernmentIssueIdNuber;
+
+	private String governmentIssueIdType;
 
 	private LocalDate employeeDOB;
 
 	private String employeeSex;
 
-	private List<ContactDTO> contacts;
+	private List<ContactDTO> contactDTOs;
 
-	private List<EmployeeAddressDTO> employeeAddress;
+	private List<EmployeeAddressDTO> employeeAddressDTOs;
 
 }

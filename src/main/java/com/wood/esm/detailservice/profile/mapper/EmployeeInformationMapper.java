@@ -26,8 +26,8 @@ public interface EmployeeInformationMapper
 	 * @return
 	 */
 	@Mappings({ @Mapping( source = "employeeActivation.employeeActivationId", target = "employeeActivationId" ),
-	@Mapping( target = "contacts", ignore = true ),
-	@Mapping( target = "employeeAddress", ignore = true ) })
+	@Mapping( target = "contactDTOs", ignore = true ),
+	@Mapping( target = "employeeAddressDTOs", ignore = true ) })
 	EmployeeInformationDTO toDTO( EmployeeInformation employeeInformation );
 	
 	/**

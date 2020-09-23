@@ -8,7 +8,6 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.wood.esm.detailservice.common.domain.BaseInformation;
@@ -24,44 +23,42 @@ import lombok.ToString;
  *
  */
 @Entity
-@Table( name = "EMP_ADDR" )
+@Table(name = "EMP_ADDR")
 @Getter
 @Setter
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class EmployeeAddress extends BaseInformation
-{
-	
-	@Column( name = "EMP_ADDR_ID" )
+public class EmployeeAddress extends BaseInformation {
+
+	@Column(name = "EMP_ADDR_ID")
 	@Id
-	@GeneratedValue( strategy = GenerationType.SEQUENCE, generator = "employee_address_generator" )
-	@SequenceGenerator( name = "employee_address_generator", sequenceName = "", allocationSize = 1 )
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer employeeAddressId;
-	
-	@ManyToOne( fetch = FetchType.LAZY )
-	@JoinColumn( name ="EMP_INFO_ID", updatable = false )
+
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "EMP_INFO_ID", updatable = false)
 	private EmployeeInformation employeeInformation;
-	
-	@Column( name = "EMP_CD" )
+
+	@Column(name = "EMP_CD")
 	private String employeeCode;
-	
-	@Column( name = "STATE_CD" )
+
+	@Column(name = "STATE_CD")
 	private String stateCode;
-	
-	@Column( name = "CTY_NM" )
+
+	@Column(name = "CTY_NM")
 	private String cityName;
-	
-	@Column( name = "CNTRY_CD" )
+
+	@Column(name = "CNTRY_CD")
 	private String countryCode;
-	
-	@Column( name = "ADDR_LN_1" )
+
+	@Column(name = "ADDR_LN_1")
 	private String addressLine1;
-	
-	@Column( name = "ADDR_LN_2" )
+
+	@Column(name = "ADDR_LN_2")
 	private String addressLine2;
-	
-	@Column( name = "ZIP_CD" )
+
+	@Column(name = "ZIP_CD")
 	private Integer zipCode;
 
 }

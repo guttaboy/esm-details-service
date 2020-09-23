@@ -36,7 +36,8 @@ public interface EmployeeInformationRepository extends JpaRepository<EmployeeInf
 		{
 		case INSERT:
 		{
-			save( employeeInformation );
+			// save and return object while Insert
+			saveAndFlush(employeeInformation);
 			break;
 		}
 		case UPDATE:

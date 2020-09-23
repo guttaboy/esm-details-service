@@ -30,6 +30,6 @@ public class EmployeeActivationDTO extends BaseInformationDTO
 	
 	private String password;
 	
-	private List<EmployeeInformationDTO> employeeInformations; 
+	private List<EmployeeInformationDTO> employeeInformationDTOs; 
 
 }
