@@ -3,6 +3,8 @@ package com.wood.esm.detailservice.profile.domain;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
@@ -31,13 +33,7 @@ public class Contact extends BaseInformation {
 
 	@Column(name = "CNTC_ID")
 	@Id
-	/*
-	 * @GeneratedValue(strategy = GenerationType.SEQUENCE, generator =
-	 * "contact_generator")
-	 * 
-	 * @SequenceGenerator(name = "contact_generator", sequenceName = "",
-	 * allocationSize = 1)
-	 */
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer contactId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -51,9 +47,9 @@ public class Contact extends BaseInformation {
 	private String emailId;
 
 	@Column(name = "HME_PHN_NBR")
-	private Integer homePhoneNumber;
+	private String homePhoneNumber;
 
 	@Column(name = "WRK_PHN_NBR")
-	private Integer workPhoneNumber;
+	private String workPhoneNumber;
 
 }

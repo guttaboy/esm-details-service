@@ -35,146 +35,138 @@ import lombok.extern.slf4j.XSlf4j;
 @AllArgsConstructor
 @NoArgsConstructor
 @XSlf4j
-public class EmployeeInformationService extends BaseService
-{
-	
+public class EmployeeInformationService extends BaseService {
+
 	@Autowired
 	private EmployeeInformationRepository employeeInformationRepository;
-	
+
 	@Autowired
 	private EmployeeInformationMapper employeeInformationMapper;
-	
+
 	@Autowired
 	private ContactRepository contactRepository;
-	
+
 	@Autowired
 	private ContactMapper contactMapper;
-	
+
 	/**
 	 * Method: getEmployeeInformationDetails
+	 * 
 	 * @param employeeActivationId
 	 * @param employeeCode
 	 * @return
 	 */
-	@Transactional( readOnly = true, propagation = Propagation.NOT_SUPPORTED )
-	public EmployeeInformationGetResponse getEmployeeInformationDetails( Integer employeeActivationId, String employeeCode)
-	{
-		
+	@Transactional(readOnly = true, propagation = Propagation.NOT_SUPPORTED)
+	public EmployeeInformationGetResponse getEmployeeInformationDetails(Integer employeeActivationId,
+			String employeeCode) {
+
 		log.entry();
-		List<EmployeeInformation> employeeInformationRetrieved = employeeInformationRepository.
-				findEmployeeInformationIdByEmployeeActivationIdAndEmployeeCode( employeeActivationId, employeeCode );
-		
-		List<EmployeeInformationDTO> employeeInformationDTOs = employeeInformationMapper.toDTOs(employeeInformationRetrieved);
+		List<EmployeeInformation> employeeInformationRetrieved = employeeInformationRepository
+				.findEmployeeInformationIdByEmployeeActivationIdAndEmployeeCode(employeeActivationId, employeeCode);
+
+		List<EmployeeInformationDTO> employeeInformationDTOs = employeeInformationMapper
+				.toDTOs(employeeInformationRetrieved);
 		retrieveAndMapContacts(employeeInformationDTOs);
-		
+
 		EmployeeInformationGetResponse employeeInformationGetResponse = new EmployeeInformationGetResponse();
-				employeeInformationGetResponse.setEmployeeInformationDTOs( employeeInformationDTOs);
-			
+		employeeInformationGetResponse.setEmployeeInformationDTOs(employeeInformationDTOs);
+
 		log.exit();
 		return employeeInformationGetResponse;
-		
+
 	}
-	
+
 	/**
 	 * Method: retrieveAndMapContacts
+	 * 
 	 * @param employeeInformationDTO
 	 * @return
 	 */
-	private void retrieveAndMapContacts( List<EmployeeInformationDTO> employeeInformationDTOs )
-	{
-		employeeInformationDTOs.stream().forEach( ( employeeInformationDTO ) -> {
-			employeeInformationDTO.setContacts( contactMapper.toDTOs( contactRepository
-					.findContactIdByEmployeeInfoIdAndEmployeeCode(employeeInformationDTO.getEmployeeInfoId(),
-							employeeInformationDTO.getEmployeeCode() ) ) );
-		});	
+	private void retrieveAndMapContacts(List<EmployeeInformationDTO> employeeInformationDTOs) {
+		employeeInformationDTOs.stream().forEach((employeeInformationDTO) -> {
+			employeeInformationDTO
+					.setContactDTOs(contactMapper.toDTOs(contactRepository.findContactIdByEmployeeInfoIdAndEmployeeCode(
+							employeeInformationDTO.getEmployeeInfoId(), employeeInformationDTO.getEmployeeCode())));
+		});
 	}
-	
+
 	/**
+	 * method: updateEmployeeInformations
+	 * 
 	 * @param employeeInformationDTOs
 	 * @return
 	 * @throws Exception
 	 */
-	@Transactional( readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = Exception.class )
-	public EmployeeInformationUpdateResponse updateEmployeeInformations( List<EmployeeInformationDTO> employeeInformationDTOs) throws
-	Exception 
-	{
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+	public EmployeeInformationUpdateResponse updateEmployeeInformations(
+			List<EmployeeInformationDTO> employeeInformationDTOs) throws Exception {
 		log.entry();
-		
+
 		String traceId = getTraceId();
 		EmployeeInformationUpdateResponse employeeInformationUpdateResponse = new EmployeeInformationUpdateResponse();
-		
+
 		employeeInformationDTOs.forEach(employeeInformationDTO -> {
 			employeeInformationDTO.setTransactionKey(traceId);
-			
-			EmployeeInformation employeeInformationRetrieved = employeeInformationMapper.fromDTO( employeeInformationDTO );
-			
+
+			EmployeeInformation employeeInformationRetrieved = employeeInformationMapper
+					.fromDTO(employeeInformationDTO);
+
 			List<Contact> contactReferences = null;
-			if( CollectionUtils.isNotEmpty( employeeInformationDTO.getContacts() ) )
-			{
-				employeeInformationDTO.getContacts().forEach( contactDTO -> {
+			if (CollectionUtils.isNotEmpty(employeeInformationDTO.getContactDTOs())) {
+				employeeInformationDTO.getContactDTOs().forEach(contactDTO -> {
 					contactDTO.setTransactionKey(traceId);
 				});
-				contactReferences = contactMapper.fromDTOs(employeeInformationDTO.getContacts());
+				contactReferences = contactMapper.fromDTOs(employeeInformationDTO.getContactDTOs());
 			}
-			try
-			{
-				switch( employeeInformationDTO.getRowAction())
-				{
-				case INSERT:
-				{
+			try {
+				switch (employeeInformationDTO.getRowAction()) {
+				case INSERT: {
 					employeeInformationRepository.updateEmployeeInformations(employeeInformationRetrieved);
-					if( CollectionUtils.isNotEmpty(contactReferences ))
-					{
+
+					// Retrieved employeeInfoId from saveAndFlush Method in Repository
+					if (CollectionUtils.isNotEmpty(contactReferences)) {
 						contactReferences.forEach(contact -> {
-							contact.setEmployeeInformation( employeeInformationRetrieved );
+							contact.setEmployeeInformation(employeeInformationRetrieved);
+						}); 
+						contactRepository.updateContacts(contactReferences);
+					}
+					
+					break;
+				}
+				case UPDATE: {
+					employeeInformationRepository.updateEmployeeInformations(employeeInformationRetrieved);
+					if (CollectionUtils.isNotEmpty(contactReferences)) {
+						contactReferences.forEach(contact -> {
+							contact.setEmployeeInformation(employeeInformationRetrieved);
 						});
 						contactRepository.updateContacts(contactReferences);
 					}
 					break;
 				}
-				case UPDATE:
-				{
-					employeeInformationRepository.updateEmployeeInformations(employeeInformationRetrieved);
-					if( CollectionUtils.isNotEmpty(contactReferences ))
-					{
-						contactReferences.forEach(contact -> {
-							contact.setEmployeeInformation( employeeInformationRetrieved );
-						});
-						contactRepository.updateContacts(contactReferences);
-					}
-					break;
-				}
-				case DELETE:
-				{
-					if( CollectionUtils.isNotEmpty(contactReferences ))
-					{
+				case DELETE: {
+					if (CollectionUtils.isNotEmpty(contactReferences)) {
 						contactRepository.deleteAll(contactReferences);
 					}
 					employeeInformationRepository.delete(employeeInformationRetrieved);
 					break;
 				}
-				case NOACTION:
-				{
-					if(CollectionUtils.isNotEmpty(contactReferences ))
-					{
+				case NOACTION: {
+					if (CollectionUtils.isNotEmpty(contactReferences)) {
 						contactRepository.updateContacts(contactReferences);
 					}
 					break;
 				}
-				default:
-				{
-					throw new RuntimeException( employeeInformationDTO.getRowAction().name() + "Invalid Row Action" );
+				default: {
+					throw new RuntimeException(employeeInformationDTO.getRowAction().name() + "Invalid Row Action");
 				}
 				}
 				employeeInformationUpdateResponse.setStatus("UPDATED SUCCESSFULLY");
+			} catch (Exception e) {
+				employeeInformationUpdateResponse.setStatus("FAIL");
 			}
-			catch( Exception e )
-			{
-				employeeInformationUpdateResponse.setStatus( "FAIL" );
-			}
-			
+
 		});
-		
+
 		return employeeInformationUpdateResponse;
 	}
 

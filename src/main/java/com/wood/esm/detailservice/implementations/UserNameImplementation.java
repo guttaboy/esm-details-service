@@ -13,12 +13,12 @@ public class UserNameImplementation
 	{
 		
 		
-		String firstName = employeeActivationDTO.getEmployeeInformations().get(0).getEmployeeFirstName();
+		String firstName = employeeActivationDTO.getEmployeeInformationDTOs().get(0).getEmployeeFirstName();
 		//get First character from Frist Name
 		char firstFN = firstName.charAt(0);
 		String stringFirstFN =String.valueOf(firstFN);  
 		
-		String lastName = employeeActivationDTO.getEmployeeInformations().get(0).getEmployeeLastName();
+		String lastName = employeeActivationDTO.getEmployeeInformationDTOs().get(0).getEmployeeLastName();
 		//get first character from Last Name
 		char firstLN = lastName.charAt(0);
 		String stringFirstLN =String.valueOf(firstLN);  

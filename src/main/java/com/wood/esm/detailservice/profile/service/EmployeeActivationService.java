@@ -18,6 +18,7 @@ import com.wood.esm.detailservice.profile.repository.EmployeeActivationRepositor
 import com.wood.esm.detailservice.profile.repository.EmployeeInformationRepository;
 import com.wood.esm.detailservice.profile.service.base.BaseService;
 import com.wood.esm.detailservice.profile.web.response.EmployeeActivationGetResponse;
+import com.wood.esm.detailservice.profile.web.response.EmployeeActivationResponse;
 import com.wood.esm.detailservice.profile.web.response.EmployeeActivationUpdateResponse;
 
 import lombok.AllArgsConstructor;
@@ -100,7 +101,7 @@ public class EmployeeActivationService extends BaseService {
 		List<EmployeeInformationDTO> employeeInformationsDTOResult = employeeInformationMapper
 				.toDTOs(employeeInformationsRetrieved);
 		if (employeeInformationsDTOResult.size() > 0) {
-			employeeActivationDTO.setEmployeeInformations(employeeInformationsDTOResult);
+			employeeActivationDTO.setEmployeeInformationDTOs(employeeInformationsDTOResult);
 		}
 		return employeeActivationDTO;
 	}
@@ -124,21 +125,21 @@ public class EmployeeActivationService extends BaseService {
 		if (employeeActivationDTO.getUserName() == null || employeeActivationDTO.getUserName().isEmpty()) {
 			String userName = userNameImplementation.generateUserName(employeeActivationDTO);
 
-			while (!employeeActivationRepository.findEmployeeActivationIdByUserName(userName).isEmpty()) {
+			while (!employeeActivationRepository.findEmployeeActivationByUserName(userName).isEmpty()) {
 				userName = userNameImplementation.generateUserName(employeeActivationDTO);
 			}
 
 			employeeActivationDTO.setUserName(userName);
 		} else {
 			// Junit test case check
-			log.info("Do Not Provide UserName");
+			employeeActivationUpdateResponse.setStatus("Do Not Provide UserName");
 		}
 
 		// Password check!!
 		boolean pass = false;
 		pass = passwordvalidation(employeeActivationDTO);
-		if (pass == true) {
-			System.out.println("it's true");
+		if (pass == false) {
+			employeeActivationUpdateResponse.setStatus("Your Password must match the requirement");
 		}
 
 		EmployeeActivation employeeActivation = employeeActivationMapper.fromDTO(employeeActivationDTO);
@@ -147,23 +148,37 @@ public class EmployeeActivationService extends BaseService {
 			switch (employeeActivationDTO.getRowAction()) {
 			case INSERT: {
 				employeeActivationRepository.updateEmployeeActivation(employeeActivation);
+
+				// retrieve EmployeeActivationID using saveAndFlush
+				// method in repository layer.
+				Integer employeeActivationIdRetrieved = employeeActivation.getEmployeeActivationId();
+
 				// Upating Informations when DTOs are passed.
-				if (!employeeActivationDTO.getEmployeeInformations().isEmpty()) {
+				if (!employeeActivationDTO.getEmployeeInformationDTOs().isEmpty()) {
 
 					List<EmployeeInformationDTO> employeeInformationDTOs = employeeActivationDTO
-							.getEmployeeInformations();
+							.getEmployeeInformationDTOs();
+
+					// set employeeActivationId to all employeeInformation objects
+					employeeInformationDTOs.forEach(employeeInformationDTO -> {
+						employeeInformationDTO.setEmployeeActivationId(employeeActivationIdRetrieved);
+					});
 					employeeInformationService.updateEmployeeInformations(employeeInformationDTOs);
-
 				}
+				EmployeeActivationResponse employeeActivationResponse = new EmployeeActivationResponse();
+				employeeActivationResponse.setEmployeeActivationId(employeeActivationIdRetrieved);
+				employeeActivationResponse.setUserName(employeeActivationDTO.getUserName());
+				employeeActivationUpdateResponse.setEmployeeActivationResponse(employeeActivationResponse);
+				employeeActivationUpdateResponse.setStatus("Success :D");
+				
 				break;
-
 			}
 			case UPDATE: {
-				log.info("no updates are Allowed:C");
+				employeeActivationUpdateResponse.setStatus("no updates are Allowed:C");
 				break;
 			}
 			case DELETE: {
-				log.info("Thanks for Trying it! wait for the result:X");
+				employeeActivationUpdateResponse.setStatus("Thanks for Trying it! wait for the result:X");
 				break;
 			}
 			case NOACTION: {
@@ -177,7 +192,7 @@ public class EmployeeActivationService extends BaseService {
 				throw new RuntimeException(employeeActivationDTO.getRowAction().name() + " Invalid Row Action");
 			}
 			}
-			employeeActivationUpdateResponse.setStatus("Success :D");
+			
 		} catch (Exception ex) {
 
 			// if any exceptions set status to fail

@@ -42,7 +42,7 @@ public class EsmDetailsServiceApplicationTests {
 		employeeActivationDTO.setRowAction(RowActionCodeEnum.INSERT);
 		employeeActivationDTO.setTransactionKey("xaguytr16545r");
 		employeeActivationDTO.setUserName("JUNIT");
-		employeeActivationDTO.setEmployeeInformations(employeeInformationDTOsList);
+		employeeActivationDTO.setEmployeeInformationDTOs(employeeInformationDTOsList);
 
 		return employeeActivationDTO;
 
@@ -61,7 +61,7 @@ public class EsmDetailsServiceApplicationTests {
 		employeeInformationDTO.setEmployeeLastName("Gutta");
 		employeeInformationDTO.setEmployeeInfoId(2001);
 		employeeInformationDTO.setEmployeeSex("Male");
-		employeeInformationDTO.setEmployeeSSN("999999999");
+		employeeInformationDTO.setEmployeeGovernmentIssueIdNuber("999999999");
 		employeeInformationDTO.setEmployeeDOB(LocalDate.of(1994, 12, 20));
 		employeeInformationDTO.setCreateTimeStamp(LocalDateTime.of(2020, 9, 15, 22, 30));
 		employeeInformationDTO.setEffectiveDate(LocalDate.of(2020, 9, 15));

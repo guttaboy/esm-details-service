@@ -10,8 +10,6 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.wood.esm.detailservice.profile.domain.EmployeeActivation;
-import com.wood.esm.detailservice.profile.web.response.EmployeeActivationResponse;
-import com.wood.esm.detailservice.profile.web.response.EmployeeActivationUpdateResponse;
 
 public interface EmployeeActivationRepository extends JpaRepository<EmployeeActivation, Integer> 
 {
@@ -36,21 +34,20 @@ public interface EmployeeActivationRepository extends JpaRepository<EmployeeActi
 	@Query( "select employeeActivation from EmployeeActivation employeeActivation "
 			+ "where employeeActivation.userName = :userName " )
 	@Transactional( readOnly = true, propagation = Propagation.NOT_SUPPORTED )
-	List<EmployeeActivation> findEmployeeActivationIdByUserName( @Param( "userName") String userName );
+	List<EmployeeActivation> findEmployeeActivationByUserName( @Param( "userName") String userName );
 	
 	/**
 	 * @param employeeActivation
 	 * @return
 	 */
 	@Transactional( readOnly = false, propagation = Propagation.MANDATORY, rollbackFor = Exception.class )
-	public default EmployeeActivationUpdateResponse updateEmployeeActivation( EmployeeActivation employeeActivation )
+	public default void updateEmployeeActivation( EmployeeActivation employeeActivation )
 	{
-		EmployeeActivationUpdateResponse updateResponse = new EmployeeActivationUpdateResponse();
 		switch( employeeActivation.getRowAction() )
 		{
 		    case INSERT:
 		    {
-		    	save( employeeActivation );
+		    	saveAndFlush( employeeActivation );
 		    	break;
 		}
 		    case UPDATE:
@@ -79,11 +76,6 @@ public interface EmployeeActivationRepository extends JpaRepository<EmployeeActi
 	    		throw new RuntimeException( employeeActivation.getRowAction().name() + "Invalid Row Action" );
 	    	}
 		}
-		
-		EmployeeActivationResponse employeeActivationResponse = new EmployeeActivationResponse( employeeActivation.getEmployeeActivationId(),
-				employeeActivation.getUserName());
-		updateResponse.setEmployeeActivationResponse(employeeActivationResponse);
-		return updateResponse;
 	}
 
 }

@@ -12,7 +12,6 @@ import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
-import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 
 import com.wood.esm.detailservice.common.domain.DateInformation;
@@ -38,8 +37,7 @@ public class EmployeeInformation extends DateInformation {
 
 	@Column(name = "EMP_INFO_ID")
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "employee_info_generator")
-	@SequenceGenerator(name = "employee_info_generator", sequenceName = "", allocationSize = 1)
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Integer employeeInfoId;
 
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -58,20 +56,22 @@ public class EmployeeInformation extends DateInformation {
 	@Column(name = "EMP_LST_NM")
 	private String employeeLastName;
 
-	@Column(name = "EMP_SSN")
-	private String employeeSSN;
+	@Column(name = "EMP_GOV_ISS_ID_NBR")
+	private String employeeGovernmentIssueIdNuber;
+
+	@Column(name = "GOV_ISS_ID_TYP")
+	private String governmentIssueIdType;
 
 	@Column(name = "EMP_DOB")
 	private LocalDate employeeDOB;
 
 	@Column(name = "EMP_SEX")
-	// @Type(type = "yes_no")
 	private String employeeSex;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employeeInformation")
 	private List<Contact> contacts;
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "employeeInformation")
-	private List<EmployeeAddress> employeeAddress;
+	private List<EmployeeAddress> employeeAddresses;
 
 }
