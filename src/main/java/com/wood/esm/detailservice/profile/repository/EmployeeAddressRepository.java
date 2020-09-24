@@ -34,4 +34,34 @@ public interface EmployeeAddressRepository extends JpaRepository<EmployeeAddress
 	@Transactional( readOnly = true, propagation = Propagation.NOT_SUPPORTED )
 	List<EmployeeAddress> findEmployeeAddressIdByEmployeeInfoId( @Param( "employeeInfoId") Integer employeeInfoId );
 
+	/**
+	 * @param employeeAddresses
+	 */
+	@Transactional(readOnly = false, propagation = Propagation.MANDATORY, rollbackFor = Exception.class)
+	public default void updateEmployeeAddresses(List<EmployeeAddress> employeeAddresses) {
+		
+		employeeAddresses.forEach(employeeAddress -> {
+			switch (employeeAddress.getRowAction()) {
+			case INSERT: {
+				save(employeeAddress);
+				break;
+			}
+			case UPDATE: {
+				save(employeeAddress);
+				break;
+			}
+			case DELETE: {
+				delete(employeeAddress);
+				break;
+			}
+			case NOACTION: {
+				break;
+			}
+			default: {
+				throw new RuntimeException(employeeAddress.getRowAction().name() + "Invalid Row Action");
+			}
+			}
+		});
+	}
+		
 }

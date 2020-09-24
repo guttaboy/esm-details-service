@@ -15,16 +15,16 @@ public class UserNameImplementation
 		
 		String firstName = employeeActivationDTO.getEmployeeInformationDTOs().get(0).getEmployeeFirstName();
 		//get First character from Frist Name
-		char firstFN = firstName.charAt(0);
+		char firstFN = Character.toUpperCase(firstName.charAt(0));
 		String stringFirstFN =String.valueOf(firstFN);  
 		
 		String lastName = employeeActivationDTO.getEmployeeInformationDTOs().get(0).getEmployeeLastName();
 		//get first character from Last Name
-		char firstLN = lastName.charAt(0);
+		char firstLN = Character.toUpperCase(lastName.charAt(0));
 		String stringFirstLN =String.valueOf(firstLN);  
 		
 		//generate Random number
-		int randonNumber = RandomUtils.nextInt(999);
+		int randonNumber = RandomUtils.nextInt(9999);
 	    String randonNumberToString = "" + randonNumber;
 		
 		String userName = (stringFirstFN +  stringFirstLN + randonNumberToString );
