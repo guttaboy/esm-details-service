@@ -28,8 +28,8 @@ public class ContactDTO extends BaseInformationDTO
 	
 	private String emailId;
 	
-	private Integer homePhoneNumber;
+	private String homePhoneNumber;
 	
-	private Integer workPhoneNumber;
+	private String workPhoneNumber;
 
 }

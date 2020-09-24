@@ -138,15 +138,16 @@ public class EmployeeActivationService extends BaseService {
 		// Password check!!
 		boolean pass = false;
 		pass = passwordvalidation(employeeActivationDTO);
-		if (pass == false) {
-			employeeActivationUpdateResponse.setStatus("Your Password must match the requirement");
-		}
 
 		EmployeeActivation employeeActivation = employeeActivationMapper.fromDTO(employeeActivationDTO);
 
 		try {
 			switch (employeeActivationDTO.getRowAction()) {
 			case INSERT: {
+				if (pass == false) {
+					employeeActivationUpdateResponse.setStatus("Your Password must match the requirement");
+					break;
+				} else {
 				employeeActivationRepository.updateEmployeeActivation(employeeActivation);
 
 				// retrieve EmployeeActivationID using saveAndFlush
@@ -172,6 +173,7 @@ public class EmployeeActivationService extends BaseService {
 				employeeActivationUpdateResponse.setStatus("Success :D");
 				
 				break;
+				}
 			}
 			case UPDATE: {
 				employeeActivationUpdateResponse.setStatus("no updates are Allowed:C");

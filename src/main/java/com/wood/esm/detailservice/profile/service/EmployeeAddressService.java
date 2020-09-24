@@ -13,6 +13,7 @@ import com.wood.esm.detailservice.profile.mapper.EmployeeAddressMapper;
 import com.wood.esm.detailservice.profile.repository.EmployeeAddressRepository;
 import com.wood.esm.detailservice.profile.service.base.BaseService;
 import com.wood.esm.detailservice.profile.web.response.EmployeeAddressGetResponse;
+import com.wood.esm.detailservice.profile.web.response.EmployeeAddressUpdateResponse;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -58,5 +59,29 @@ public class EmployeeAddressService extends BaseService {
 
 		log.exit();
 		return employeeGetResponse;
+	}
+	
+	/**
+	 * @param employeeAddressDTOs
+	 * @return
+	 * @throws Exception
+	 */
+	@Transactional(readOnly = false, propagation = Propagation.REQUIRED, rollbackFor = Exception.class)
+	public EmployeeAddressUpdateResponse updateEmployeeAddresses(List<EmployeeAddressDTO> employeeAddressDTOs) throws Exception {
+		
+		log.entry();
+		EmployeeAddressUpdateResponse employeeAddressUpdateResponse = new EmployeeAddressUpdateResponse();
+		
+		String traceId = getTraceId();
+		employeeAddressDTOs.forEach(employeeAddressDTO -> { 
+			employeeAddressDTO.setTransactionKey(traceId);
+		});
+		List<EmployeeAddress> employeeAddressesRetrieved = employeeAddressMapper.fromDTOs(employeeAddressDTOs);
+		employeeAddressRepository.updateEmployeeAddresses(employeeAddressesRetrieved);
+		employeeAddressUpdateResponse.setStatus("RECORD UPDATED SUCCESSFULLY");
+		log.exit();
+		
+		return employeeAddressUpdateResponse;
+		
 	}
 }

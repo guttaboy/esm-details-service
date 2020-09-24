@@ -10,10 +10,13 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.wood.esm.detailservice.profile.DTO.EmployeeInformationDTO;
 import com.wood.esm.detailservice.profile.domain.Contact;
+import com.wood.esm.detailservice.profile.domain.EmployeeAddress;
 import com.wood.esm.detailservice.profile.domain.EmployeeInformation;
 import com.wood.esm.detailservice.profile.mapper.ContactMapper;
+import com.wood.esm.detailservice.profile.mapper.EmployeeAddressMapper;
 import com.wood.esm.detailservice.profile.mapper.EmployeeInformationMapper;
 import com.wood.esm.detailservice.profile.repository.ContactRepository;
+import com.wood.esm.detailservice.profile.repository.EmployeeAddressRepository;
 import com.wood.esm.detailservice.profile.repository.EmployeeInformationRepository;
 import com.wood.esm.detailservice.profile.service.base.BaseService;
 import com.wood.esm.detailservice.profile.web.response.EmployeeInformationGetResponse;
@@ -48,6 +51,12 @@ public class EmployeeInformationService extends BaseService {
 
 	@Autowired
 	private ContactMapper contactMapper;
+	
+	@Autowired
+	private EmployeeAddressMapper employeeAddressMapper;
+	
+	@Autowired
+	private EmployeeAddressRepository employeeAddressRepository;
 
 	/**
 	 * Method: getEmployeeInformationDetails
@@ -118,6 +127,14 @@ public class EmployeeInformationService extends BaseService {
 				});
 				contactReferences = contactMapper.fromDTOs(employeeInformationDTO.getContactDTOs());
 			}
+			
+			List<EmployeeAddress> addressReferences = null;
+			if (CollectionUtils.isNotEmpty(employeeInformationDTO.getEmployeeAddressDTOs())) {
+				employeeInformationDTO.getEmployeeAddressDTOs().forEach(employeeAddressDTO -> {
+					employeeAddressDTO.setTransactionKey(traceId);
+				});
+				addressReferences = employeeAddressMapper.fromDTOs(employeeInformationDTO.getEmployeeAddressDTOs());
+			}
 			try {
 				switch (employeeInformationDTO.getRowAction()) {
 				case INSERT: {
@@ -130,6 +147,12 @@ public class EmployeeInformationService extends BaseService {
 						}); 
 						contactRepository.updateContacts(contactReferences);
 					}
+					if (CollectionUtils.isNotEmpty(addressReferences)) {
+						addressReferences.forEach(address -> {
+							address.setEmployeeInformation(employeeInformationRetrieved);
+						}); 
+						employeeAddressRepository.updateEmployeeAddresses(addressReferences);
+					}
 					
 					break;
 				}
@@ -141,11 +164,20 @@ public class EmployeeInformationService extends BaseService {
 						});
 						contactRepository.updateContacts(contactReferences);
 					}
+					if (CollectionUtils.isNotEmpty(addressReferences)) {
+						addressReferences.forEach(address -> {
+							address.setEmployeeInformation(employeeInformationRetrieved);
+						}); 
+						employeeAddressRepository.updateEmployeeAddresses(addressReferences);
+					}
 					break;
 				}
 				case DELETE: {
 					if (CollectionUtils.isNotEmpty(contactReferences)) {
 						contactRepository.deleteAll(contactReferences);
+					}
+					if (CollectionUtils.isNotEmpty(addressReferences)) {
+						employeeAddressRepository.deleteAll(addressReferences);
 					}
 					employeeInformationRepository.delete(employeeInformationRetrieved);
 					break;
@@ -153,6 +185,9 @@ public class EmployeeInformationService extends BaseService {
 				case NOACTION: {
 					if (CollectionUtils.isNotEmpty(contactReferences)) {
 						contactRepository.updateContacts(contactReferences);
+					}
+					if (CollectionUtils.isNotEmpty(addressReferences)) {
+						employeeAddressRepository.updateEmployeeAddresses(addressReferences);
 					}
 					break;
 				}
